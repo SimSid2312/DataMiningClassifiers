@@ -215,7 +215,7 @@ build_tree <- function(TreeNode){
 }
 rootTreeNode <- list(dataset="NULL",bestSplit="NULL",info_gain="NULL",leftChild="NULL",rightChild="NuLL")
 rootTreeNode$dataset <- dataset #set : dataset parameter of this node
-resultant <- build_tree(rootTreeNode)
+resultant <- build_tree(rootTreeNode) #Pass this node to func : predictDataSetClass
 
 
 #predicting class for a test row
@@ -260,10 +260,21 @@ prediction <- function(node,test_row) {
 }
 
 #prediction
-test_row <- dataset[130,]
-node <- resultant
-predicted_classes <- prediction(node,test_row)
-prediction_class_name <- names( which.max(as.data.frame(predicted_class)) )
+#test_row <- dataset[130,]
+#node <- resultant
+#predicted_classes <- prediction(node,test_row)
+#prediction_class_name <- names( which.max(as.data.frame(predicted_class)) )
 
-#looping over the dataset and predicting the class using our decision tree 
+#looping over the dataset and predicting the class using our decision tree
+resultTestClass <- list(ActualClass=dataset[,num_feature+1],PredictedClass="NA")
+predictDataSetClass <- function(decisionTreeNode,testData){
+  for (row in 1:length(testData[,num_feature+1])){
+    test_row <-  testData[row,]
+    resultTestClass$PredictedClass[row] <- names( which.max(as.data.frame(prediction(decisionTreeNode,test_row))) )
+  }
+  return (resultTestClass)
+}
 
+testingResult <- as.data.frame(predictDataSetClass(resultant,dataset))
+error_rate <- 100 * (1-sum(testingResult$PredictedClass==testingResult$ActualClass) / length(dataset[,1]))
+correct_pred_rate <- 100 * (sum(testingResult$PredictedClass==testingResult$ActualClass) / length(dataset[,1]))
